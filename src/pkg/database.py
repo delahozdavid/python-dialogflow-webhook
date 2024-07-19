@@ -29,19 +29,12 @@ async def create_pool():
 async def webhook_logs(pool, webhookcall_id, details, result_code, timestamp, time_elapsed):
     async with pool.acquire() as connection:
         try:
-            # Si el `webhookcall_id` no se pasa, generarlo
             if not webhookcall_id:
                 webhookcall_id = str(uuid.uuid4())
-            
-            # Convertir timestamp a datetime.datetime si es una cadena
             if isinstance(timestamp, str):
                 timestamp = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
-            
-            # Convertir time_elapsed a una cadena si es un float
             if isinstance(time_elapsed, float):
                 time_elapsed = timedelta(microseconds=time_elapsed)
-            
-            # Realizar la inserción en la base de datos
             await connection.execute("""
                 INSERT INTO webhook_logs (webhookcall_id, details, result_code, timestamp, time_elapsed)
                 VALUES ($1, $2, $3, $4, $5)
